@@ -1,12 +1,26 @@
 import React from 'react';
-import { Col, Form, FormGroup, Input, CustomInput, Button } from 'reactstrap';
+import { Col, Form, FormGroup, Input, CustomInput, Button, ButtonGroup } from 'reactstrap';
 
-const SearchForm = ({ currentTerm, handleTypePick, handleInputChange, handleDelayedPick }) => (
+const SearchForm = ({
+  type,
+  currentTerm,
+  handleTypePick,
+  handleInputChange,
+  handleDelayedPick
+}) => (
   <>
     <Form>
       <FormGroup row onClick={handleTypePick}>
-        <Button color="link">Departures</Button>
-        <Button color="link">Arrivals</Button>
+        <Col>
+          <ButtonGroup>
+            <Button color="info" value="departure" active={type === 'departure'}>
+              Departures
+            </Button>
+            <Button color="info" value="arrival" active={type === 'arrival'}>
+              Arrivals
+            </Button>
+          </ButtonGroup>
+        </Col>
       </FormGroup>
       <FormGroup row style={{ marginBottom: '2.2rem' }}>
         <Col xs={10} sm={10}>

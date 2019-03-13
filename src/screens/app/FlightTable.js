@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'reactstrap';
 import * as moment from 'moment';
-import * as helpers from 'utils/helpers';
+import { iataCodes } from 'utils/iata';
 
 const FlightTable = ({ flights, type, delayedOnly }) => {
   // Sort initial array
@@ -30,11 +30,11 @@ const FlightTable = ({ flights, type, delayedOnly }) => {
     const { iataCode: city1 } = departure;
     const { iataCode: city2 } = arrival;
 
-    if (helpers.iataCodes[city1]) {
-      flight.departure.iataCode = helpers.iataCodes[city1].name;
+    if (iataCodes[city1]) {
+      flight.departure.iataCode = iataCodes[city1].name;
     }
-    if (helpers.iataCodes[city2]) {
-      flight.arrival.iataCode = helpers.iataCodes[city2].name;
+    if (iataCodes[city2]) {
+      flight.arrival.iataCode = iataCodes[city2].name;
     }
 
     return flight;

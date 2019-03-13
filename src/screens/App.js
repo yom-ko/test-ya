@@ -10,15 +10,15 @@ import FlightTable from 'screens/app/FlightTable';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 
-import { getURL, fetchFlights, sanitizeFlights } from 'utils/api';
+import { getURL, fetchFlights, sanitizeFlights } from 'utils/helpers';
 
 // App component with routes
 class App extends Component {
   constructor(props) {
     super(props);
     this.handleTypePick = this.handleTypePick.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleDelayedPick = this.handleDelayedPick.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
 
     this.state = {
       type: 'departure',
@@ -44,27 +44,32 @@ class App extends Component {
   }
 
   handleTypePick(e) {
-    e.preventDefault();
     if (e.target.nodeName !== 'BUTTON') return;
+    e.preventDefault();
 
-    const type = e.target.innerText === 'Departures' ? 'departure' : 'arrival';
+    const type = e.target.value;
 
-    this.setState(
-      state => ({
+    this.setState(state => ({
+      ...state,
+      type
+    }));
+
+    const url = getURL(type);
+
+    fetchFlights(url).then(flights => {
+      const newFlights = sanitizeFlights(flights, type);
+      this.setState(state => ({
         ...state,
-        type
-      }),
-      () => {
-        const url = getURL(type);
-        fetchFlights(url).then(flights => {
-          const newFlights = sanitizeFlights(flights, type);
-          this.setState(state => ({
-            ...state,
-            flights: [...newFlights]
-          }));
-        });
-      }
-    );
+        flights: [...newFlights]
+      }));
+    });
+  }
+
+  handleDelayedPick() {
+    this.setState(state => ({
+      ...state,
+      delayedOnly: !state.delayedOnly
+    }));
   }
 
   handleInputChange(e) {
@@ -76,16 +81,6 @@ class App extends Component {
     }));
   }
 
-  handleDelayedPick() {
-    this.setState(state => {
-      const { delayedOnly } = state;
-      return {
-        ...state,
-        delayedOnly: !delayedOnly
-      };
-    });
-  }
-
   render() {
     const { type, delayedOnly, currentTerm, flights } = this.state;
 
@@ -93,10 +88,11 @@ class App extends Component {
       <Layout>
         <h1 style={{ marginBottom: '4.2rem' }}>Time Table</h1>
         <SearchForm
+          type={type}
           currentTerm={currentTerm}
           handleTypePick={this.handleTypePick}
-          handleInputChange={this.handleInputChange}
           handleDelayedPick={this.handleDelayedPick}
+          handleInputChange={this.handleInputChange}
         />
         <FlightTable flights={flights} type={type} delayedOnly={delayedOnly} />
       </Layout>

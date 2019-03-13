@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime';
 import React from 'react';
 import { render } from 'react-dom';
 
@@ -6,7 +5,7 @@ import { render } from 'react-dom';
 import App from 'screens/App';
 
 // Define App target node
-const target = document.querySelector('#app');
+const target = document.getElementById('app');
 
 // Render App
 render(<App />, target);
