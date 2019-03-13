@@ -1,15 +1,7 @@
 import React from 'react';
-import { Col, Form, FormGroup, Input, Button } from 'reactstrap';
+import { Col, Form, FormGroup, Input, CustomInput, Button } from 'reactstrap';
 
-import DatePicker from 'components/DatePicker';
-
-const SearchForm = ({
-  startDate,
-  currentTerm,
-  handleTypePick,
-  handleInputChange,
-  handleDatePick
-}) => (
+const SearchForm = ({ currentTerm, handleTypePick, handleInputChange }) => (
   <>
     <Form>
       <FormGroup row onClick={handleTypePick}>
@@ -17,11 +9,17 @@ const SearchForm = ({
         <Button color="link">Arrivals</Button>
       </FormGroup>
       <FormGroup row style={{ marginBottom: '2.2rem' }}>
-        <Col xs={6} sm={8}>
+        <Col xs={10} sm={10}>
           <Input type="text" value={currentTerm} onChange={handleInputChange} />
         </Col>
-        <Col xs={6} sm={3}>
-          <DatePicker startDate={startDate} handleDatePick={handleDatePick} />
+        <Col
+          xs={2}
+          sm={2}
+          style={{
+            fontSize: '0.9em'
+          }}
+        >
+          <CustomInput type="switch" id="delayedSwitch" name="delayedSwitch" label="Delayed only" />
         </Col>
       </FormGroup>
     </Form>

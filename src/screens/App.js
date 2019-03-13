@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { hot } from 'react-hot-loader';
-// import * as moment from 'moment';
 
 // Import high-level components
 import Layout from 'screens/app/Layout';
@@ -19,7 +18,6 @@ class App extends Component {
     super(props);
     this.handleTypePick = this.handleTypePick.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleDatePick = this.handleDatePick.bind(this);
 
     this.today = new Date();
     this.defaultStartDate = `${this.today.getFullYear()}-${`0${this.today.getMonth() + 1}`.slice(
@@ -29,6 +27,7 @@ class App extends Component {
     this.state = {
       startDate: this.defaultStartDate,
       type: 'departure',
+      delayedOnly: false,
       currentTerm: '',
       flights: []
     };
@@ -79,15 +78,6 @@ class App extends Component {
     this.setState(state => ({
       ...state,
       currentTerm
-    }));
-  }
-
-  handleDatePick(_, { startDate }) {
-    const startDateString = startDate.format('YYYY-MM-DD');
-
-    this.setState(state => ({
-      ...state,
-      startDate: startDateString
     }));
   }
 
