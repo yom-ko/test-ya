@@ -3,7 +3,7 @@ import { Table } from 'reactstrap';
 import * as moment from 'moment';
 import * as helpers from 'utils/helpers';
 
-const FlightTable = ({ flights, type }) => {
+const FlightTable = ({ flights, type, delayedOnly }) => {
   // Sort initial array
   const sortedFlights = flights.sort((a, b) => {
     let {
@@ -40,11 +40,25 @@ const FlightTable = ({ flights, type }) => {
     return flight;
   });
 
+  let processedFlights = cityMappedFlights;
+
+  if (delayedOnly) {
+    processedFlights = processedFlights.filter(flight => {
+      const { status, departure, arrival } = flight;
+
+      if (type === 'arrival') {
+        return !!arrival.delay && arrival.delay > 1 && status !== 'landed';
+      }
+
+      return !!departure.delay && arrival.delay > 1 && status !== 'landed';
+    });
+  }
+
   // Prepare data rows for the table
-  const flightRows = cityMappedFlights.map(flight => {
+  const flightRows = processedFlights.map(flight => {
     // Extract required data from the single flight object
     const { status, departure, arrival, flight: flightData } = flight;
-    const { iataNumber: number, otherIataNumbers } = flightData; // flight number
+    const { iataNumber: number, otherIataNumbers } = flightData;
 
     let additionalIataNumbers;
     if (otherIataNumbers) {
@@ -124,7 +138,7 @@ const FlightTable = ({ flights, type }) => {
                 borderBottomRightRadius: '6px'
               }}
             >
-              Event
+              Status
             </th>
           </tr>
         </thead>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Col, Form, FormGroup, Input, CustomInput, Button } from 'reactstrap';
 
-const SearchForm = ({ currentTerm, handleTypePick, handleInputChange }) => (
+const SearchForm = ({ currentTerm, handleTypePick, handleInputChange, handleDelayedPick }) => (
   <>
     <Form>
       <FormGroup row onClick={handleTypePick}>
@@ -19,7 +19,13 @@ const SearchForm = ({ currentTerm, handleTypePick, handleInputChange }) => (
             fontSize: '0.9em'
           }}
         >
-          <CustomInput type="switch" id="delayedSwitch" name="delayedSwitch" label="Delayed only" />
+          <CustomInput
+            type="switch"
+            id="delayedSwitch"
+            name="delayedSwitch"
+            label="Delayed only"
+            onClick={handleDelayedPick}
+          />
         </Col>
       </FormGroup>
     </Form>

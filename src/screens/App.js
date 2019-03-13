@@ -18,14 +18,9 @@ class App extends Component {
     super(props);
     this.handleTypePick = this.handleTypePick.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
-
-    this.today = new Date();
-    this.defaultStartDate = `${this.today.getFullYear()}-${`0${this.today.getMonth() + 1}`.slice(
-      -2
-    )}-${this.today.getDate()}`;
+    this.handleDelayedPick = this.handleDelayedPick.bind(this);
 
     this.state = {
-      startDate: this.defaultStartDate,
       type: 'departure',
       delayedOnly: false,
       currentTerm: '',
@@ -81,20 +76,29 @@ class App extends Component {
     }));
   }
 
+  handleDelayedPick() {
+    this.setState(state => {
+      const { delayedOnly } = state;
+      return {
+        ...state,
+        delayedOnly: !delayedOnly
+      };
+    });
+  }
+
   render() {
-    const { startDate, type, currentTerm, flights } = this.state;
+    const { type, delayedOnly, currentTerm, flights } = this.state;
 
     return (
       <Layout>
         <h1 style={{ marginBottom: '4.2rem' }}>Time Table</h1>
         <SearchForm
-          startDate={startDate}
           currentTerm={currentTerm}
           handleTypePick={this.handleTypePick}
           handleInputChange={this.handleInputChange}
-          handleDatePick={this.handleDatePick}
+          handleDelayedPick={this.handleDelayedPick}
         />
-        <FlightTable flights={flights} type={type} />
+        <FlightTable flights={flights} type={type} delayedOnly={delayedOnly} />
       </Layout>
     );
   }
