@@ -1,110 +1,63 @@
 import React from 'react';
 import { Table } from 'reactstrap';
 import * as moment from 'moment';
-import { iataCodes } from 'utils/iata';
+import { sortFlightsByTime, replcaeIataWithCities, getDelayedFlightsOnly } from 'utils/helpers';
 
 const FlightTable = ({ flights, type, delayedOnly }) => {
-  // Sort initial array
-  const sortedFlights = flights.sort((a, b) => {
-    let {
-      departure: { scheduledTime: timeA }
-    } = a;
-    timeA = moment(timeA, 'YYYY-MM-DDTHH:mm:ss.SSS');
+  // Sort the initial flight list by departure time
+  const sortedFlights = sortFlightsByTime(flights, type);
 
-    let {
-      departure: { scheduledTime: timeB }
-    } = b;
-    timeB = moment(timeB, 'YYYY-MM-DDTHH:mm:ss.SSS');
-
-    if (moment(timeA).isBefore(timeB)) {
-      return -1;
-    }
-    if (moment(timeA).isAfter(timeB)) {
-      return 1;
-    }
-    return 0;
-  });
-
-  const cityMappedFlights = sortedFlights.map(flight => {
-    const { departure, arrival } = flight;
-    const { iataCode: city1 } = departure;
-    const { iataCode: city2 } = arrival;
-
-    if (iataCodes[city1]) {
-      flight.departure.iataCode = iataCodes[city1].name;
-    }
-    if (iataCodes[city2]) {
-      flight.arrival.iataCode = iataCodes[city2].name;
-    }
-
-    return flight;
-  });
+  const cityMappedFlights = replcaeIataWithCities(sortedFlights);
 
   let processedFlights = cityMappedFlights;
 
   if (delayedOnly) {
-    processedFlights = processedFlights.filter(flight => {
-      const { status, departure, arrival } = flight;
-
-      if (type === 'arrival') {
-        return !!arrival.delay && arrival.delay > 1 && status !== 'landed';
-      }
-
-      return !!departure.delay && arrival.delay > 1 && status !== 'landed';
-    });
+    processedFlights = getDelayedFlightsOnly(processedFlights, type);
   }
 
   // Prepare data rows for the table
   const flightRows = processedFlights.map(flight => {
     // Extract required data from the single flight object
     const { status, departure, arrival, flight: flightData } = flight;
-    const { iataNumber: number, otherIataNumbers } = flightData;
+    const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = flightData;
 
-    let additionalIataNumbers;
-    if (otherIataNumbers) {
-      additionalIataNumbers = otherIataNumbers.map(aNumber => (
-        <span key={aNumber}>
-          {aNumber}
+    let additionalFlightNumbers;
+    if (otherFlightNumbers) {
+      additionalFlightNumbers = otherFlightNumbers.map(number => (
+        <span key={number}>
+          {number}
           <br />
         </span>
       ));
     } else {
-      additionalIataNumbers = '';
+      additionalFlightNumbers = '';
     }
 
-    // If we fetch a list of arrivals
+    let city;
+    let time;
+
     if (type === 'arrival') {
-      let { scheduledTime: time } = arrival; // time
-      // Format time
-      time = moment(time, 'YYYY-MM-DDTHH:mm:ss.SSS').format('DD.MM / HH:mm');
-      const { iataCode: city } = departure; // city
-      return (
-        <tr key={number}>
-          <td>{time}</td>
-          <td>{city}</td>
-          <td>
-            {number}
-            <br />
-            {additionalIataNumbers}
-          </td>
-          <td>{status}</td>
-        </tr>
-      );
+      // If we fetch a list of arrivals
+      const { scheduledTime: timeOfArrivalAtSVO } = arrival; // time
+      const { iataCode: cityOfDeparture } = departure; // city
+      city = cityOfDeparture;
+      time = moment(timeOfArrivalAtSVO, 'YYYY-MM-DDTHH:mm:ss.SSS').format('DD.MM / HH:mm'); // Format time
+    } else {
+      // By default, we fetch a list of departures
+      const { iataCode: cityOfArrival } = arrival; // city
+      const { scheduledTime: timeOfDepartureSVO } = departure; // time
+      city = cityOfArrival;
+      time = moment(timeOfDepartureSVO, 'YYYY-MM-DDTHH:mm:ss.SSS').format('DD.MM / HH:mm'); // Format time
     }
 
-    // By default, we fetch a list of departures
-    let { scheduledTime: time } = departure; // time
-    // Format time
-    time = moment(time, 'YYYY-MM-DDTHH:mm:ss.SSS').format('DD.MM / HH:mm');
-    const { iataCode: city } = arrival; // city
     return (
-      <tr key={number}>
+      <tr key={flightNumber}>
         <td>{time}</td>
         <td>{city}</td>
         <td>
-          {number}
+          {flightNumber}
           <br />
-          {additionalIataNumbers}
+          {additionalFlightNumbers}
         </td>
         <td>{status}</td>
       </tr>

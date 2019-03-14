@@ -1,3 +1,6 @@
+import * as moment from 'moment';
+import { iataCodes } from 'utils/iata';
+
 export const baseURL = 'http://aviation-edge.com/v2/public/timetable?key=20cf89-d78f2c&iataCode=SVO';
 
 export function getURL(type) {
@@ -17,62 +20,110 @@ export function fetchFlights(url) {
     });
 }
 
-// FIX: fix the algorithm
+// FIX: fix the algorithm?
 export function sanitizeFlights(flights, type) {
-  let prevTime;
   let prevCity;
+  let prevTime;
 
-  const newFlights = [];
+  const sanitizedFlights = []; // List of the deduplicated flights
 
   for (let i = 0; i < flights.length; i++) {
     const { departure, arrival } = flights[i];
 
-    // If we fetch a list of arrivals
-    if (type === 'arrival') {
-      const { scheduledTime: time } = departure;
-      const { iataCode: city } = arrival;
+    let city;
+    let time;
 
-      if (time === prevTime && city === prevCity) {
-        if (newFlights[newFlights.length - 1].flight.otherIataNumbers) {
-          newFlights[newFlights.length - 1].flight.otherIataNumbers.push(
-            flights[i].flight.iataNumber
-          );
-        } else {
-          newFlights[newFlights.length - 1].flight.otherIataNumbers = [];
-          newFlights[newFlights.length - 1].flight.otherIataNumbers.push(
-            flights[i].flight.iataNumber
-          );
-        }
-      } else {
-        newFlights.push(flights[i]);
-      }
-      prevTime = time;
-      prevCity = city;
+    if (type === 'arrival') {
+      // If we fetch a list of arrivals
+      const { iataCode: cityOfDeparture } = departure;
+      const { scheduledTime: timeOfArrivalAtSVO } = arrival;
+      city = cityOfDeparture; // from where the flight arrives at SVO
+      time = timeOfArrivalAtSVO; // what time the flight should arrive at SVO
     } else {
       // By default, we fetch a list of departures
-      const { scheduledTime: time } = arrival;
-      const { iataCode: city } = departure;
-
-      if (time === prevTime && city === prevCity) {
-        if (newFlights[newFlights.length - 1].flight.otherIataNumbers) {
-          newFlights[newFlights.length - 1].flight.otherIataNumbers.push(
-            flights[i].flight.iataNumber
-          );
-        } else {
-          newFlights[newFlights.length - 1].flight.otherIataNumbers = [];
-          newFlights[newFlights.length - 1].flight.otherIataNumbers.push(
-            flights[i].flight.iataNumber
-          );
-        }
-      } else {
-        newFlights.push(flights[i]);
-      }
-      prevTime = time;
-      prevCity = city;
+      const { iataCode: cityOfArrival } = arrival;
+      const { scheduledTime: timeOfDepartureSVO } = departure;
+      city = cityOfArrival; // destination of the flight
+      time = timeOfDepartureSVO; // what time when the flight departs SVO
     }
+
+    if (time === prevTime && city === prevCity) {
+      if (sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers) {
+        sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers.push(
+          flights[i].flight.iataNumber
+        );
+      } else {
+        sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers = [];
+        sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers.push(
+          flights[i].flight.iataNumber
+        );
+      }
+    } else {
+      sanitizedFlights.push(flights[i]);
+    }
+    prevTime = time;
+    prevCity = city;
   }
 
-  return newFlights;
+  return sanitizedFlights;
 }
+
+export const sortFlightsByTime = (flights, type) => flights.sort((a, b) => {
+  let timeA;
+  let timeB;
+
+  if (type === 'arrival') {
+    const {
+      arrival: { scheduledTime: arrivalTimeA }
+    } = a;
+    const {
+      arrival: { scheduledTime: arrivalTimeB }
+    } = b;
+    timeA = moment(arrivalTimeA, 'YYYY-MM-DDTHH:mm:ss.SSS');
+    timeB = moment(arrivalTimeB, 'YYYY-MM-DDTHH:mm:ss.SSS');
+  } else {
+    const {
+      departure: { scheduledTime: departureTimeA }
+    } = a;
+    const {
+      departure: { scheduledTime: departureTimeB }
+    } = b;
+    timeA = moment(departureTimeA, 'YYYY-MM-DDTHH:mm:ss.SSS');
+    timeB = moment(departureTimeB, 'YYYY-MM-DDTHH:mm:ss.SSS');
+  }
+
+  if (moment(timeA).isBefore(timeB)) {
+    return -1;
+  }
+  if (moment(timeA).isAfter(timeB)) {
+    return 1;
+  }
+  return 0;
+});
+
+export const replcaeIataWithCities = flights => flights.map(flight => {
+  const { departure, arrival } = flight;
+  const { iataCode: city1 } = departure;
+  const { iataCode: city2 } = arrival;
+
+  if (iataCodes[city1]) {
+    flight.departure.iataCode = iataCodes[city1].name;
+  }
+  if (iataCodes[city2]) {
+    flight.arrival.iataCode = iataCodes[city2].name;
+  }
+
+  return flight;
+});
+
+export const getDelayedFlightsOnly = (flights, type) => flights.filter(flight => {
+  const { departure, arrival } = flight;
+
+  if (type === 'arrival') {
+    return arrival.delay && arrival.delay > 1;
+  }
+
+  return departure.delay && departure.delay > 1;
+});
 
 export default fetchFlights;

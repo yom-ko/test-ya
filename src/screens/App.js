@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { hot } from 'react-hot-loader';
 
 // Import high-level components
@@ -8,12 +8,11 @@ import FlightTable from 'screens/app/FlightTable';
 
 // Import Bootstrap styles (shared by all components)
 import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-daterangepicker/daterangepicker.css';
 
 import { getURL, fetchFlights, sanitizeFlights } from 'utils/helpers';
 
 // App component with routes
-class App extends Component {
+class App extends PureComponent {
   constructor(props) {
     super(props);
     this.handleTypePick = this.handleTypePick.bind(this);
