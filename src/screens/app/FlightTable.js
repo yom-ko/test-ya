@@ -46,7 +46,7 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
     const { city, mainTime, secondaryTime } = getCityAndTimeFor1Flight(type, departure, arrival);
 
     return (
-      <tr key={flightNumber} style={{ color: status === 'отменен' ? 'red' : 'unset' }}>
+      <tr key={flightNumber} style={{ color: (status === 'отменен' || status === 'летный инцидент' || status === 'совершил посадку вне маршрута' || status === 'сменил курс') ? 'red' : 'unset' }}>
         <td>
           <s>{secondaryTime === mainTime ? '' : secondaryTime}</s>
         </td>
