@@ -8,17 +8,22 @@ const SearchForm = ({ type, handleTypePick, handleInputChange, handleDelayedPick
         <Col>
           <ButtonGroup>
             <Button color="info" value="departure" active={type === 'departure'}>
-              Departures
+              Вылет
             </Button>
             <Button color="info" value="arrival" active={type === 'arrival'}>
-              Arrivals
+              Прилет
             </Button>
           </ButtonGroup>
         </Col>
       </FormGroup>
       <FormGroup row style={{ marginBottom: '2.2rem' }}>
         <Col xs={10} sm={10}>
-          <Input type="search" placeholder="Поиск по номеру рейса" onChange={handleInputChange} />
+          <Input
+            type="search"
+            spellCheck="false"
+            placeholder="Поиск по номеру рейса"
+            onChange={handleInputChange}
+          />
         </Col>
         <Col
           xs={2}
@@ -31,7 +36,7 @@ const SearchForm = ({ type, handleTypePick, handleInputChange, handleDelayedPick
             type="switch"
             id="delayedSwitch"
             name="delayedSwitch"
-            label="Delayed only"
+            label="Только задержанные"
             onClick={handleDelayedPick}
           />
         </Col>

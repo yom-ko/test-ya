@@ -7,7 +7,7 @@ import { getDelayedFlightsOnly } from 'utils/helpers';
 const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => {
   // Check if only delayed flights were requested
   let flightsToDisplay = flights;
-  const upperCurrentTerm = currentTerm.toUpperCase();
+  const upCurrentTerm = currentTerm.toUpperCase();
 
   if (delayedOnly) {
     flightsToDisplay = getDelayedFlightsOnly(flightsToDisplay, type);
@@ -19,11 +19,11 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
 
     let otherFlightNumbersIncludeTerm = false;
     if (otherFlightNumbers) {
-      otherFlightNumbersIncludeTerm = otherFlightNumbers.some(number => number.includes(upperCurrentTerm)
+      otherFlightNumbersIncludeTerm = otherFlightNumbers.some(number => number.includes(upCurrentTerm)
       );
     }
 
-    return flightNumber.includes(upperCurrentTerm) || otherFlightNumbersIncludeTerm;
+    return flightNumber.includes(upCurrentTerm) || otherFlightNumbersIncludeTerm;
   });
 
   // Prepare data rows for the table
@@ -104,17 +104,17 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
                   borderBottomLeftRadius: '6px'
                 }}
               >
-                Time
+                дата/время
               </th>
-              <th>City</th>
-              <th>Number</th>
+              <th>{type === 'arrival' ? 'начальный пункт' : 'конечный пункт'}</th>
+              <th>рейс №</th>
               <th
                 style={{
                   borderTopRightRadius: '6px',
                   borderBottomRightRadius: '6px'
                 }}
               >
-                Status
+                статус
               </th>
             </tr>
           </thead>
