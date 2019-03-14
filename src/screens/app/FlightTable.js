@@ -45,25 +45,93 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
     }
 
     let city;
-    let time;
+    let mainTime;
+    let secondaryTime;
 
     if (type === 'arrival') {
       // If we fetch a list of arrivals
-      const { scheduledTime: timeOfArrivalAtSVO } = arrival; // time
       const { iataCode: cityOfDeparture } = departure; // city
+      let {
+        scheduledTime: scheduledTimeOfArrival,
+        estimatedTime: estimatedTimeOfArrival,
+        actualTime: actualTimeOfArrival
+      } = arrival;
+
       city = cityOfDeparture;
-      time = moment(timeOfArrivalAtSVO, 'YYYY-MM-DDTHH:mm:ss.SSS').format('DD.MM / HH:mm'); // Format time
+
+      scheduledTimeOfArrival = moment(scheduledTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+        'DD.MM / HH:mm'
+      );
+
+      if (estimatedTimeOfArrival && actualTimeOfArrival) {
+        actualTimeOfArrival = moment(actualTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+          'DD.MM / HH:mm'
+        );
+        estimatedTimeOfArrival = moment(estimatedTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+          'DD.MM / HH:mm'
+        );
+        mainTime = actualTimeOfArrival;
+        secondaryTime = estimatedTimeOfArrival;
+      } else if (estimatedTimeOfArrival) {
+        estimatedTimeOfArrival = moment(estimatedTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+          'DD.MM / HH:mm'
+        );
+        mainTime = estimatedTimeOfArrival;
+        secondaryTime = scheduledTimeOfArrival;
+      } else if (actualTimeOfArrival) {
+        actualTimeOfArrival = moment(actualTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+          'DD.MM / HH:mm'
+        );
+        mainTime = actualTimeOfArrival;
+        secondaryTime = scheduledTimeOfArrival;
+      }
     } else {
       // By default, we fetch a list of departures
       const { iataCode: cityOfArrival } = arrival; // city
-      const { scheduledTime: timeOfDepartureSVO } = departure; // time
+      let {
+        scheduledTime: scheduledTimeOfDeparture,
+        estimatedTime: estimatedTimeOfDeparture,
+        actualTime: actualTimeOfDeparture
+      } = departure; // time
+
       city = cityOfArrival;
-      time = moment(timeOfDepartureSVO, 'YYYY-MM-DDTHH:mm:ss.SSS').format('DD.MM / HH:mm'); // Format time
+
+      scheduledTimeOfDeparture = moment(scheduledTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+        'DD.MM / HH:mm'
+      );
+
+      if (estimatedTimeOfDeparture && actualTimeOfDeparture) {
+        actualTimeOfDeparture = moment(actualTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+          'DD.MM / HH:mm'
+        );
+        estimatedTimeOfDeparture = moment(
+          estimatedTimeOfDeparture,
+          'YYYY-MM-DDTHH:mm:ss.SSS'
+        ).format('DD.MM / HH:mm');
+        mainTime = actualTimeOfDeparture;
+        secondaryTime = estimatedTimeOfDeparture;
+      } else if (estimatedTimeOfDeparture) {
+        estimatedTimeOfDeparture = moment(
+          estimatedTimeOfDeparture,
+          'YYYY-MM-DDTHH:mm:ss.SSS'
+        ).format('DD.MM / HH:mm');
+        mainTime = estimatedTimeOfDeparture;
+        secondaryTime = scheduledTimeOfDeparture;
+      } else if (actualTimeOfDeparture) {
+        actualTimeOfDeparture = moment(actualTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
+          'DD.MM / HH:mm'
+        );
+        mainTime = actualTimeOfDeparture;
+        secondaryTime = scheduledTimeOfDeparture;
+      }
     }
 
     return (
       <tr key={flightNumber}>
-        <td>{time}</td>
+        <td>
+          <s>{secondaryTime === mainTime ? '' : secondaryTime}</s>
+        </td>
+        <td>{mainTime}</td>
         <td>{city}</td>
         <td>
           {flightNumber}
@@ -89,33 +157,19 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
           }}
         />
       ) : (
-        <Table borderless>
+        <Table hover>
           <thead
             style={{
-              backgroundColor: '#ccc',
-              fontWeight: 'bold',
-              lineHeight: '1.2'
+              backgroundColor: '#dee2e6'
             }}
           >
             <tr>
-              <th
-                style={{
-                  borderTopLeftRadius: '6px',
-                  borderBottomLeftRadius: '6px'
-                }}
-              >
-                дата/время
+              <th colSpan="2" style={{ textAlign: 'center' }}>
+                дата / время
               </th>
               <th>{type === 'arrival' ? 'начальный пункт' : 'конечный пункт'}</th>
               <th>рейс №</th>
-              <th
-                style={{
-                  borderTopRightRadius: '6px',
-                  borderBottomRightRadius: '6px'
-                }}
-              >
-                статус
-              </th>
+              <th>статус</th>
             </tr>
           </thead>
           <tbody>{flightRows}</tbody>

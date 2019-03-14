@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { iataCodes } from 'utils/iata';
+import { iataStatuses, iataCodes } from 'utils/iata';
 
 export const baseURL = 'http://aviation-edge.com/v2/public/timetable?key=20cf89-d78f2c&iataCode=SVO';
 
@@ -102,9 +102,13 @@ export const sortFlightsByTime = (flights, type) => flights.sort((a, b) => {
 });
 
 export const replcaeIataWithCities = flights => flights.map(flight => {
-  const { departure, arrival } = flight;
+  const { status, departure, arrival } = flight;
   const { iataCode: city1 } = departure;
   const { iataCode: city2 } = arrival;
+
+  if (iataStatuses[status]) {
+    flight.status = iataStatuses[status];
+  }
 
   if (iataCodes[city1]) {
     flight.departure.iataCode = iataCodes[city1].name;
@@ -117,10 +121,10 @@ export const replcaeIataWithCities = flights => flights.map(flight => {
 });
 
 export const getDelayedFlightsOnly = (flights, type) => flights.filter(flight => {
-  const { departure, arrival } = flight;
+  const { status, departure, arrival } = flight;
 
   if (type === 'arrival') {
-    return arrival.delay && arrival.delay > 1;
+    return arrival.delay && arrival.delay > 1 && status !== 'совершил посадку';
   }
 
   return departure.delay && departure.delay > 1;
