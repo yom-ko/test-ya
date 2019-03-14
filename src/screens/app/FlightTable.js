@@ -4,13 +4,27 @@ import { Table, Spinner } from 'reactstrap';
 
 import { getDelayedFlightsOnly } from 'utils/helpers';
 
-const FlightTable = ({ type, delayedOnly, isLoading, flights }) => {
+const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => {
   // Check if only delayed flights were requested
   let flightsToDisplay = flights;
+  const upperCurrentTerm = currentTerm.toUpperCase();
 
   if (delayedOnly) {
     flightsToDisplay = getDelayedFlightsOnly(flightsToDisplay, type);
   }
+
+  flightsToDisplay = flightsToDisplay.filter(flight => {
+    const { flight: flightData } = flight;
+    const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = flightData;
+
+    let otherFlightNumbersIncludeTerm = false;
+    if (otherFlightNumbers) {
+      otherFlightNumbersIncludeTerm = otherFlightNumbers.some(number => number.includes(upperCurrentTerm)
+      );
+    }
+
+    return flightNumber.includes(upperCurrentTerm) || otherFlightNumbersIncludeTerm;
+  });
 
   // Prepare data rows for the table
   const flightRows = flightsToDisplay.map(flight => {

@@ -93,6 +93,7 @@ class App extends PureComponent {
         <FlightTable
           type={type}
           delayedOnly={delayedOnly}
+          currentTerm={currentTerm}
           isLoading={isLoading}
           flights={flights}
         />

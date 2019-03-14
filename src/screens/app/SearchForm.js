@@ -18,7 +18,7 @@ const SearchForm = ({ type, handleTypePick, handleInputChange, handleDelayedPick
       </FormGroup>
       <FormGroup row style={{ marginBottom: '2.2rem' }}>
         <Col xs={10} sm={10}>
-          <Input type="text" onChange={handleInputChange} />
+          <Input type="search" placeholder="Поиск по номеру рейса" onChange={handleInputChange} />
         </Col>
         <Col
           xs={2}
