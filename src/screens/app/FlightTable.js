@@ -1,8 +1,7 @@
 import React from 'react';
-import * as moment from 'moment';
 import { Table, Spinner } from 'reactstrap';
 
-import { getDelayedFlightsOnly } from 'utils/helpers';
+import { getDelayedFlightsOnly, getCityAndTimeFor1Flight } from 'utils/helpers';
 
 const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => {
   // Check if only delayed flights were requested
@@ -44,90 +43,10 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
       additionalFlightNumbers = '';
     }
 
-    let city;
-    let mainTime;
-    let secondaryTime;
-
-    if (type === 'arrival') {
-      // If we fetch a list of arrivals
-      const { iataCode: cityOfDeparture } = departure; // city
-      let {
-        scheduledTime: scheduledTimeOfArrival,
-        estimatedTime: estimatedTimeOfArrival,
-        actualTime: actualTimeOfArrival
-      } = arrival;
-
-      city = cityOfDeparture;
-
-      scheduledTimeOfArrival = moment(scheduledTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
-
-      if (estimatedTimeOfArrival && actualTimeOfArrival) {
-        actualTimeOfArrival = moment(actualTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-          'DD.MM / HH:mm'
-        );
-        estimatedTimeOfArrival = moment(estimatedTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-          'DD.MM / HH:mm'
-        );
-        mainTime = actualTimeOfArrival;
-        secondaryTime = estimatedTimeOfArrival;
-      } else if (estimatedTimeOfArrival) {
-        estimatedTimeOfArrival = moment(estimatedTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-          'DD.MM / HH:mm'
-        );
-        mainTime = estimatedTimeOfArrival;
-        secondaryTime = scheduledTimeOfArrival;
-      } else if (actualTimeOfArrival) {
-        actualTimeOfArrival = moment(actualTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-          'DD.MM / HH:mm'
-        );
-        mainTime = actualTimeOfArrival;
-        secondaryTime = scheduledTimeOfArrival;
-      }
-    } else {
-      // By default, we fetch a list of departures
-      const { iataCode: cityOfArrival } = arrival; // city
-      let {
-        scheduledTime: scheduledTimeOfDeparture,
-        estimatedTime: estimatedTimeOfDeparture,
-        actualTime: actualTimeOfDeparture
-      } = departure; // time
-
-      city = cityOfArrival;
-
-      scheduledTimeOfDeparture = moment(scheduledTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
-
-      if (estimatedTimeOfDeparture && actualTimeOfDeparture) {
-        actualTimeOfDeparture = moment(actualTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-          'DD.MM / HH:mm'
-        );
-        estimatedTimeOfDeparture = moment(
-          estimatedTimeOfDeparture,
-          'YYYY-MM-DDTHH:mm:ss.SSS'
-        ).format('DD.MM / HH:mm');
-        mainTime = actualTimeOfDeparture;
-        secondaryTime = estimatedTimeOfDeparture;
-      } else if (estimatedTimeOfDeparture) {
-        estimatedTimeOfDeparture = moment(
-          estimatedTimeOfDeparture,
-          'YYYY-MM-DDTHH:mm:ss.SSS'
-        ).format('DD.MM / HH:mm');
-        mainTime = estimatedTimeOfDeparture;
-        secondaryTime = scheduledTimeOfDeparture;
-      } else if (actualTimeOfDeparture) {
-        actualTimeOfDeparture = moment(actualTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-          'DD.MM / HH:mm'
-        );
-        mainTime = actualTimeOfDeparture;
-        secondaryTime = scheduledTimeOfDeparture;
-      }
-    }
+    const { city, mainTime, secondaryTime } = getCityAndTimeFor1Flight(type, departure, arrival);
 
     return (
-      <tr key={flightNumber}>
+      <tr key={flightNumber} style={{ color: status === 'отменен' ? 'red' : 'unset' }}>
         <td>
           <s>{secondaryTime === mainTime ? '' : secondaryTime}</s>
         </td>
@@ -166,8 +85,10 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
             <tr>
               <th colSpan="2" style={{ textAlign: 'center' }}>
                 дата / время
+                {' '}
+                {type === 'arrival' ? 'прилета' : 'вылета'}
               </th>
-              <th>{type === 'arrival' ? 'начальный пункт' : 'конечный пункт'}</th>
+              <th>{type === 'arrival' ? 'пункт отправления' : 'пункт прибытия'}</th>
               <th>рейс №</th>
               <th>статус</th>
             </tr>

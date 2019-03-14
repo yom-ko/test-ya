@@ -2,8 +2,8 @@ export const iataStatuses = {
   landed: 'совершил посадку',
   scheduled: 'ожидается',
   cancelled: 'отменен',
-  active: 'в полете или буксируется',
-  incident: 'инцидент',
+  active: 'в полете',
+  incident: 'летный инцидент',
   diverted: 'совершил посадку вне маршрута',
   redirected: 'сменил курс',
   unknown: 'не известен'

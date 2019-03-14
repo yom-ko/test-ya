@@ -82,7 +82,7 @@ class App extends PureComponent {
 
     return (
       <Layout>
-        <h1 style={{ fontSize: '2em', marginBottom: '4.2rem' }}>Табло рейсов Шереметьево</h1>
+        <h1 style={{ fontSize: '1.8em', marginBottom: '4.2rem' }}>Табло рейсов Шереметьево</h1>
         <SearchForm
           type={type}
           currentTerm={currentTerm}
