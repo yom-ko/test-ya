@@ -1,22 +1,19 @@
 import React from 'react';
-import { Table } from 'reactstrap';
 import * as moment from 'moment';
-import { sortFlightsByTime, replcaeIataWithCities, getDelayedFlightsOnly } from 'utils/helpers';
+import { Table, Spinner } from 'reactstrap';
 
-const FlightTable = ({ flights, type, delayedOnly }) => {
-  // Sort the initial flight list by departure time
-  const sortedFlights = sortFlightsByTime(flights, type);
+import { getDelayedFlightsOnly } from 'utils/helpers';
 
-  const cityMappedFlights = replcaeIataWithCities(sortedFlights);
-
-  let processedFlights = cityMappedFlights;
+const FlightTable = ({ type, delayedOnly, isLoading, flights }) => {
+  // Check if only delayed flights were requested
+  let flightsToDisplay = flights;
 
   if (delayedOnly) {
-    processedFlights = getDelayedFlightsOnly(processedFlights, type);
+    flightsToDisplay = getDelayedFlightsOnly(flightsToDisplay, type);
   }
 
   // Prepare data rows for the table
-  const flightRows = processedFlights.map(flight => {
+  const flightRows = flightsToDisplay.map(flight => {
     // Extract required data from the single flight object
     const { status, departure, arrival, flight: flightData } = flight;
     const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = flightData;
@@ -66,37 +63,50 @@ const FlightTable = ({ flights, type, delayedOnly }) => {
 
   return (
     <>
-      <Table borderless>
-        <thead
+      {isLoading ? (
+        <Spinner
+          color="primary"
           style={{
-            backgroundColor: '#ccc',
-            fontWeight: 'bold',
-            lineHeight: '1.2'
+            width: '2rem',
+            height: '2rem',
+            marginTop: '3em',
+            position: 'absolute',
+            left: '40%'
           }}
-        >
-          <tr>
-            <th
-              style={{
-                borderTopLeftRadius: '6px',
-                borderBottomLeftRadius: '6px'
-              }}
-            >
-              Time
-            </th>
-            <th>City</th>
-            <th>Number</th>
-            <th
-              style={{
-                borderTopRightRadius: '6px',
-                borderBottomRightRadius: '6px'
-              }}
-            >
-              Status
-            </th>
-          </tr>
-        </thead>
-        <tbody>{flightRows}</tbody>
-      </Table>
+        />
+      ) : (
+        <Table borderless>
+          <thead
+            style={{
+              backgroundColor: '#ccc',
+              fontWeight: 'bold',
+              lineHeight: '1.2'
+            }}
+          >
+            <tr>
+              <th
+                style={{
+                  borderTopLeftRadius: '6px',
+                  borderBottomLeftRadius: '6px'
+                }}
+              >
+                Time
+              </th>
+              <th>City</th>
+              <th>Number</th>
+              <th
+                style={{
+                  borderTopRightRadius: '6px',
+                  borderBottomRightRadius: '6px'
+                }}
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>{flightRows}</tbody>
+        </Table>
+      )}
     </>
   );
 };

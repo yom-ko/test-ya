@@ -126,4 +126,29 @@ export const getDelayedFlightsOnly = (flights, type) => flights.filter(flight =>
   return departure.delay && departure.delay > 1;
 });
 
+export function receiveFlights(type) {
+  // 1. Get URL
+  const url = getURL(type);
+
+  return new Promise((resolve, reject) => {
+    // 2. Fetch flight data from API
+    fetchFlights(url).then(flights => {
+      try {
+        // 3. Sort
+        const sortedFlights = sortFlightsByTime(flights, type);
+
+        // 4. Sanitize
+        const sanitizedFlights = sanitizeFlights(sortedFlights, type);
+
+        // 5. Replcae IATA codes with citiy names
+        const processedFlights = replcaeIataWithCities(sanitizedFlights);
+
+        resolve(processedFlights);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
 export default fetchFlights;

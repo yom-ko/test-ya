@@ -9,7 +9,7 @@ import FlightTable from 'screens/app/FlightTable';
 // Import Bootstrap styles (shared by all components)
 import 'bootstrap/dist/css/bootstrap.css';
 
-import { getURL, fetchFlights, sanitizeFlights } from 'utils/helpers';
+import { receiveFlights } from 'utils/helpers';
 
 // App component with routes
 class App extends PureComponent {
@@ -23,6 +23,7 @@ class App extends PureComponent {
       type: 'departure',
       delayedOnly: false,
       currentTerm: '',
+      isLoading: true,
       flights: []
     };
   }
@@ -30,14 +31,11 @@ class App extends PureComponent {
   componentDidMount() {
     const { type } = this.state;
 
-    const url = getURL(type);
-
-    fetchFlights(url).then(flights => {
-      const newFlights = sanitizeFlights(flights, type);
-
+    receiveFlights(type).then(flights => {
       this.setState(state => ({
         ...state,
-        flights: [...newFlights]
+        isLoading: false,
+        flights: [...flights]
       }));
     });
   }
@@ -50,16 +48,15 @@ class App extends PureComponent {
 
     this.setState(state => ({
       ...state,
+      isLoading: true,
       type
     }));
 
-    const url = getURL(type);
-
-    fetchFlights(url).then(flights => {
-      const newFlights = sanitizeFlights(flights, type);
+    receiveFlights(type).then(flights => {
       this.setState(state => ({
         ...state,
-        flights: [...newFlights]
+        isLoading: false,
+        flights: [...flights]
       }));
     });
   }
@@ -81,7 +78,7 @@ class App extends PureComponent {
   }
 
   render() {
-    const { type, delayedOnly, currentTerm, flights } = this.state;
+    const { type, delayedOnly, isLoading, currentTerm, flights } = this.state;
 
     return (
       <Layout>
@@ -93,7 +90,12 @@ class App extends PureComponent {
           handleDelayedPick={this.handleDelayedPick}
           handleInputChange={this.handleInputChange}
         />
-        <FlightTable flights={flights} type={type} delayedOnly={delayedOnly} />
+        <FlightTable
+          type={type}
+          delayedOnly={delayedOnly}
+          isLoading={isLoading}
+          flights={flights}
+        />
       </Layout>
     );
   }
