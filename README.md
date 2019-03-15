@@ -1,7 +1,4 @@
-1. Install [json-server](https://github.com/typicode/json-server#getting-started) globally
-2. In the project root, run `yarn` to install deps
-3. Run `json-server --watch src/utils/db.json --port 3004`
-4. Then run `yarn start` to start the dev server
+FYI: This project uses a free Timetable API from Aviation Edge which (if i got it right) is limited to 100 calls per month. So if the flight list isn't loaded at all, the calls are probably exhausted. Please, take care.
 
 Key libs used in this project:
 
@@ -9,8 +6,4 @@ Key libs used in this project:
 - Styling:
   - UI Lib - Reactstrap (reactstrap)
   - CSS Framework - Bootstrap (bootstrap)
-  - Icons - Octicons (octicons-react)
-- State Management - Redux (redux + react-redux)
-- Side Effect Management - Redux-Saga (redux-saga)
-- Routing - React Router (react-router-dom)
-- Widgets\* - react-bootstrap-daterangepicker
+- Utilities - Moment.js
