@@ -28,6 +28,12 @@
     "jsx-a11y/no-noninteractive-element-to-interactive-role": ["off"],
     "jsx-a11y/no-noninteractive-element-interactions": ["off"],
     "no-console": ["off"],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     "no-return-assign": ["off"],
     "no-unused-expressions": [
@@ -37,6 +43,7 @@
       }
     ],
     "object-curly-newline": ["off"],
+    "operator-linebreak": ["error", "after"],
     "react/jsx-filename-extension": [
       "error",
       {

@@ -1,7 +1,9 @@
 import * as moment from 'moment';
 import { iataStatuses, iataCodes } from 'utils/iata';
 
-export const baseURL = 'https://aviation-edge.com/v2/public/timetable?key=20cf89-d78f2c&iataCode=SVO';
+// eslint-disable-next-line operator-linebreak
+export const baseURL =
+  'https://aviation-edge.com/v2/public/timetable?key=20cf89-d78f2c&iataCode=SVO';
 
 export function getURL(type) {
   return `${baseURL}&type=${type}`;
@@ -62,8 +64,8 @@ export function sanitizeFlights(flights, type) {
 
   const sanitizedFlights = []; // List of the deduplicated flights
 
-  for (let i = 0; i < flights.length; i++) {
-    const { departure, arrival } = flights[i];
+  flights.forEach(flight => {
+    const { departure, arrival } = flight;
 
     let city;
     let time;
@@ -79,26 +81,30 @@ export function sanitizeFlights(flights, type) {
       const { iataCode: cityOfArrival } = arrival;
       const { scheduledTime: timeOfDepartureSVO } = departure;
       city = cityOfArrival; // destination of the flight
-      time = timeOfDepartureSVO; // what time when the flight departs SVO
+      time = timeOfDepartureSVO; // what time the flight departs SVO
     }
 
     if (time === prevTime && city === prevCity) {
-      if (sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers) {
-        sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers.push(
-          flights[i].flight.iataNumber
-        );
+      if (
+        sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers
+      ) {
+        sanitizedFlights[
+          sanitizedFlights.length - 1
+        ].flight.otherIataNumbers.push(flight.flight.iataNumber);
       } else {
-        sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers = [];
-        sanitizedFlights[sanitizedFlights.length - 1].flight.otherIataNumbers.push(
-          flights[i].flight.iataNumber
-        );
+        sanitizedFlights[
+          sanitizedFlights.length - 1
+        ].flight.otherIataNumbers = [];
+        sanitizedFlights[
+          sanitizedFlights.length - 1
+        ].flight.otherIataNumbers.push(flight.flight.iataNumber);
       }
     } else {
-      sanitizedFlights.push(flights[i]);
+      sanitizedFlights.push(flight);
     }
     prevTime = time;
     prevCity = city;
-  }
+  });
 
   return sanitizedFlights;
 }
@@ -138,7 +144,7 @@ export function receiveFlights(type) {
         // 4. Sanitize
         const sanitizedFlights = sanitizeFlights(sortedFlights, type);
 
-        // 5. Replcae IATA codes with citiy names
+        // 5. Replcae IATA codes with city names
         const processedFlights = replaсeIataWithCities(sanitizedFlights);
 
         resolve(processedFlights);
@@ -154,14 +160,16 @@ export function getDelayedFlightsOnly(flights, type) {
     const { status, departure, arrival } = flight;
 
     if (type === 'arrival') {
-      return arrival.delay && arrival.delay > 1 && status !== 'совершил посадку';
+      return (
+        arrival.delay && arrival.delay > 1 && status !== 'совершил посадку'
+      );
     }
 
     return (
-      departure.delay
-      && departure.delay > 1
-      && status !== 'совершил посадку'
-      && status !== 'в полете'
+      departure.delay &&
+      departure.delay > 1 &&
+      status !== 'совершил посадку' &&
+      status !== 'в полете'
     );
   });
 }
@@ -182,29 +190,37 @@ export function getCityAndTimeFor1Flight(type, departureData, arrivalData) {
 
     city = cityOfDeparture;
 
-    scheduledTimeOfArrival = moment(scheduledTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-      'DD.MM / HH:mm'
-    );
+    scheduledTimeOfArrival = moment(
+      scheduledTimeOfArrival,
+      'YYYY-MM-DDTHH:mm:ss.SSS'
+    ).format('DD.MM / HH:mm');
 
     if (estimatedTimeOfArrival && actualTimeOfArrival) {
-      actualTimeOfArrival = moment(actualTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
-      estimatedTimeOfArrival = moment(estimatedTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
+      actualTimeOfArrival = moment(
+        actualTimeOfArrival,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+      estimatedTimeOfArrival = moment(
+        estimatedTimeOfArrival,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+
       mainTime = actualTimeOfArrival;
       secondaryTime = estimatedTimeOfArrival;
     } else if (estimatedTimeOfArrival) {
-      estimatedTimeOfArrival = moment(estimatedTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
+      estimatedTimeOfArrival = moment(
+        estimatedTimeOfArrival,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+
       mainTime = estimatedTimeOfArrival;
       secondaryTime = scheduledTimeOfArrival;
     } else if (actualTimeOfArrival) {
-      actualTimeOfArrival = moment(actualTimeOfArrival, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
+      actualTimeOfArrival = moment(
+        actualTimeOfArrival,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+
       mainTime = actualTimeOfArrival;
       secondaryTime = scheduledTimeOfArrival;
     }
@@ -219,29 +235,37 @@ export function getCityAndTimeFor1Flight(type, departureData, arrivalData) {
 
     city = cityOfArrival;
 
-    scheduledTimeOfDeparture = moment(scheduledTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-      'DD.MM / HH:mm'
-    );
+    scheduledTimeOfDeparture = moment(
+      scheduledTimeOfDeparture,
+      'YYYY-MM-DDTHH:mm:ss.SSS'
+    ).format('DD.MM / HH:mm');
 
     if (estimatedTimeOfDeparture && actualTimeOfDeparture) {
-      actualTimeOfDeparture = moment(actualTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
-      estimatedTimeOfDeparture = moment(estimatedTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
+      actualTimeOfDeparture = moment(
+        actualTimeOfDeparture,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+      estimatedTimeOfDeparture = moment(
+        estimatedTimeOfDeparture,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+
       mainTime = actualTimeOfDeparture;
       secondaryTime = estimatedTimeOfDeparture;
     } else if (estimatedTimeOfDeparture) {
-      estimatedTimeOfDeparture = moment(estimatedTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
+      estimatedTimeOfDeparture = moment(
+        estimatedTimeOfDeparture,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+
       mainTime = estimatedTimeOfDeparture;
       secondaryTime = scheduledTimeOfDeparture;
     } else if (actualTimeOfDeparture) {
-      actualTimeOfDeparture = moment(actualTimeOfDeparture, 'YYYY-MM-DDTHH:mm:ss.SSS').format(
-        'DD.MM / HH:mm'
-      );
+      actualTimeOfDeparture = moment(
+        actualTimeOfDeparture,
+        'YYYY-MM-DDTHH:mm:ss.SSS'
+      ).format('DD.MM / HH:mm');
+
       mainTime = actualTimeOfDeparture;
       secondaryTime = scheduledTimeOfDeparture;
     }

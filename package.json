@@ -10,17 +10,14 @@
   },
   "dependencies": {
     "bootstrap": "4.3.1",
-    "bootstrap-daterangepicker": "3.0.3",
-    "jquery": "3.3.1",
     "moment": "2.24.0",
     "react": "16.8.4",
-    "react-bootstrap-daterangepicker": "4.1.0",
     "react-dom": "16.8.4",
     "reactstrap": "7.1.0"
   },
   "devDependencies": {
-    "@babel/core": "7.3.4",
-    "@babel/preset-env": "7.3.4",
+    "@babel/core": "7.4.0",
+    "@babel/preset-env": "7.4.2",
     "@babel/preset-react": "7.0.0",
     "babel-loader": "8.0.5",
     "browser-sync": "2.26.3",
@@ -28,7 +25,7 @@
     "clean-webpack-plugin": "2.0.1",
     "cross-env": "5.2.0",
     "css-loader": "2.1.1",
-    "eslint": "5.15.1",
+    "eslint": "5.15.3",
     "eslint-config-airbnb": "17.1.0",
     "eslint-plugin-import": "2.16.0",
     "eslint-plugin-jsx-a11y": "6.2.1",
@@ -47,7 +44,7 @@
     "style-loader": "0.23.1",
     "url-loader": "1.1.2",
     "webpack": "4.29.6",
-    "webpack-cli": "3.2.3",
+    "webpack-cli": "3.3.0",
     "webpack-dev-server": "3.2.1",
     "webpack-merge": "4.2.1"
   }
