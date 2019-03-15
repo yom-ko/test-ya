@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 import { iataStatuses, iataCodes } from 'utils/iata';
 
-export const baseURL = 'http://aviation-edge.com/v2/public/timetable?key=20cf89-d78f2c&iataCode=SVO';
+export const baseURL = 'https://aviation-edge.com/v2/public/timetable?key=20cf89-d78f2c&iataCode=SVO';
 
 export function getURL(type) {
   return `${baseURL}&type=${type}`;
