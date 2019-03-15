@@ -9,7 +9,6 @@
     "build": "cross-env NODE_ENV=production webpack --config ./wp_config/prod.js"
   },
   "dependencies": {
-    "@githubprimer/octicons-react": "8.5.0",
     "bootstrap": "4.3.1",
     "bootstrap-daterangepicker": "3.0.3",
     "jquery": "3.3.1",
@@ -17,11 +16,7 @@
     "react": "16.8.4",
     "react-bootstrap-daterangepicker": "4.1.0",
     "react-dom": "16.8.4",
-    "react-redux": "6.0.1",
-    "react-router-dom": "4.3.1",
-    "reactstrap": "7.1.0",
-    "redux": "4.0.1",
-    "redux-saga": "1.0.2"
+    "reactstrap": "7.1.0"
   },
   "devDependencies": {
     "@babel/core": "7.3.4",
@@ -30,7 +25,7 @@
     "babel-loader": "8.0.5",
     "browser-sync": "2.26.3",
     "browser-sync-webpack-plugin": "2.2.2",
-    "clean-webpack-plugin": "2.0.0",
+    "clean-webpack-plugin": "2.0.1",
     "cross-env": "5.2.0",
     "css-loader": "2.1.1",
     "eslint": "5.15.1",

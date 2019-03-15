@@ -1,14 +1,15 @@
 export const iataStatuses = {
-  landed: 'совершил посадку',
   scheduled: 'ожидается',
-  cancelled: 'отменен',
   active: 'в полете',
-  incident: 'летный инцидент',
-  diverted: 'совершил посадку вне маршрута',
+  landed: 'совершил посадку',
+  cancelled: 'отменен',
   redirected: 'сменил курс',
+  diverted: 'совершил внеплановую посадку',
+  incident: 'летный инцидент',
   unknown: 'не известен'
 };
 
+// TODO: Add missing codes / names
 export const iataCodes = {
   AAC: {
     name: 'Эль-Ариш',

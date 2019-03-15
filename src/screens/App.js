@@ -19,6 +19,7 @@ class App extends PureComponent {
     this.handleDelayedPick = this.handleDelayedPick.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
 
+    // Initial app state
     this.state = {
       type: 'departure',
       delayedOnly: false,
@@ -28,6 +29,7 @@ class App extends PureComponent {
     };
   }
 
+  // Receive and save departures list on page load
   componentDidMount() {
     const { type } = this.state;
 
@@ -40,6 +42,8 @@ class App extends PureComponent {
     });
   }
 
+  // Receive an updated list of departures or arrivals
+  // depending on the flight type button clicked.
   handleTypePick(e) {
     if (e.target.nodeName !== 'BUTTON') return;
     e.preventDefault();
@@ -61,6 +65,8 @@ class App extends PureComponent {
     });
   }
 
+  // If the `Delayed only` toggle has been clicked,
+  // change the app state accordingly.
   handleDelayedPick() {
     this.setState(state => ({
       ...state,
@@ -68,6 +74,8 @@ class App extends PureComponent {
     }));
   }
 
+  // Save the current user's input as
+  // she is typing in the search field.
   handleInputChange(e) {
     const currentTerm = e.target.value;
 
@@ -77,6 +85,7 @@ class App extends PureComponent {
     }));
   }
 
+  // Render the entire app
   render() {
     const { type, delayedOnly, isLoading, currentTerm, flights } = this.state;
 
@@ -85,7 +94,6 @@ class App extends PureComponent {
         <h1 style={{ fontSize: '1.8em', marginBottom: '4.2rem' }}>Табло рейсов Шереметьево</h1>
         <SearchForm
           type={type}
-          currentTerm={currentTerm}
           handleTypePick={this.handleTypePick}
           handleDelayedPick={this.handleDelayedPick}
           handleInputChange={this.handleInputChange}

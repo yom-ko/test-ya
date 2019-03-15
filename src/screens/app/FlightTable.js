@@ -6,23 +6,24 @@ import { getDelayedFlightsOnly, getCityAndTimeFor1Flight } from 'utils/helpers';
 const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => {
   // Check if only delayed flights were requested
   let flightsToDisplay = flights;
-  const upCurrentTerm = currentTerm.toUpperCase();
+  const currentTermCAP = currentTerm.toUpperCase();
 
   if (delayedOnly) {
     flightsToDisplay = getDelayedFlightsOnly(flightsToDisplay, type);
   }
 
+  // Filter flights according to the current search term (`live search`)
   flightsToDisplay = flightsToDisplay.filter(flight => {
     const { flight: flightData } = flight;
     const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = flightData;
 
-    let otherFlightNumbersIncludeTerm = false;
+    let isOtherFlightNumbersIncludeTerm = false;
     if (otherFlightNumbers) {
-      otherFlightNumbersIncludeTerm = otherFlightNumbers.some(number => number.includes(upCurrentTerm)
+      isOtherFlightNumbersIncludeTerm = otherFlightNumbers.some(number => number.includes(currentTermCAP)
       );
     }
 
-    return flightNumber.includes(upCurrentTerm) || otherFlightNumbersIncludeTerm;
+    return flightNumber.includes(currentTermCAP) || isOtherFlightNumbersIncludeTerm;
   });
 
   // Prepare data rows for the table
@@ -33,6 +34,8 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
 
     let additionalFlightNumbers;
     if (otherFlightNumbers) {
+      // If there are additional flight numbers,
+      // format them for listing within the table cell.
       additionalFlightNumbers = otherFlightNumbers.map(number => (
         <span key={number}>
           {number}
@@ -46,7 +49,19 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
     const { city, mainTime, secondaryTime } = getCityAndTimeFor1Flight(type, departure, arrival);
 
     return (
-      <tr key={flightNumber} style={{ color: (status === 'отменен' || status === 'летный инцидент' || status === 'совершил посадку вне маршрута' || status === 'сменил курс') ? 'red' : 'unset' }}>
+      <tr
+        key={flightNumber}
+        // Color code `abnormal` statuses
+        style={{
+          color:
+            status === 'отменен'
+            || status === 'летный инцидент'
+            || status === 'сменил курс'
+            || status === 'совершил внеплановую посадку'
+              ? 'red'
+              : 'unset'
+        }}
+      >
         <td>
           <s>{secondaryTime === mainTime ? '' : secondaryTime}</s>
         </td>
@@ -62,15 +77,17 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
     );
   });
 
+  // Render the entire table
+  // or a spinner - if data are not ready yet.
   return (
     <>
       {isLoading ? (
         <Spinner
-          color="primary"
+          color="info"
           style={{
             width: '2rem',
             height: '2rem',
-            marginTop: '3em',
+            marginTop: '3rem',
             position: 'absolute',
             left: '40%'
           }}
@@ -88,7 +105,11 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
                 {' '}
                 {type === 'arrival' ? 'прилета' : 'вылета'}
               </th>
-              <th>{type === 'arrival' ? 'пункт отправления' : 'пункт прибытия'}</th>
+              <th>
+                пункт
+                {' '}
+                {type === 'arrival' ? ' отправления' : 'прибытия'}
+              </th>
               <th>рейс №</th>
               <th>статус</th>
             </tr>

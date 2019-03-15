@@ -20,7 +20,42 @@ export function fetchFlights(url) {
     });
 }
 
-// FIX: fix the algorithm?
+export function sortFlightsByTime(flights, type) {
+  return flights.sort((a, b) => {
+    let timeA;
+    let timeB;
+
+    if (type === 'arrival') {
+      const {
+        arrival: { scheduledTime: arrivalTimeA }
+      } = a;
+      const {
+        arrival: { scheduledTime: arrivalTimeB }
+      } = b;
+      timeA = moment(arrivalTimeA, 'YYYY-MM-DDTHH:mm:ss.SSS');
+      timeB = moment(arrivalTimeB, 'YYYY-MM-DDTHH:mm:ss.SSS');
+    } else {
+      const {
+        departure: { scheduledTime: departureTimeA }
+      } = a;
+      const {
+        departure: { scheduledTime: departureTimeB }
+      } = b;
+      timeA = moment(departureTimeA, 'YYYY-MM-DDTHH:mm:ss.SSS');
+      timeB = moment(departureTimeB, 'YYYY-MM-DDTHH:mm:ss.SSS');
+    }
+
+    if (moment(timeA).isBefore(timeB)) {
+      return -1;
+    }
+    if (moment(timeA).isAfter(timeB)) {
+      return 1;
+    }
+    return 0;
+  });
+}
+
+// TODO: double-check the algorithm
 export function sanitizeFlights(flights, type) {
   let prevCity;
   let prevTime;
@@ -68,72 +103,26 @@ export function sanitizeFlights(flights, type) {
   return sanitizedFlights;
 }
 
-export const sortFlightsByTime = (flights, type) => flights.sort((a, b) => {
-  let timeA;
-  let timeB;
+export function replaсeIataWithCities(flights) {
+  return flights.map(flight => {
+    const { status, departure, arrival } = flight;
+    const { iataCode: city1 } = departure;
+    const { iataCode: city2 } = arrival;
 
-  if (type === 'arrival') {
-    const {
-      arrival: { scheduledTime: arrivalTimeA }
-    } = a;
-    const {
-      arrival: { scheduledTime: arrivalTimeB }
-    } = b;
-    timeA = moment(arrivalTimeA, 'YYYY-MM-DDTHH:mm:ss.SSS');
-    timeB = moment(arrivalTimeB, 'YYYY-MM-DDTHH:mm:ss.SSS');
-  } else {
-    const {
-      departure: { scheduledTime: departureTimeA }
-    } = a;
-    const {
-      departure: { scheduledTime: departureTimeB }
-    } = b;
-    timeA = moment(departureTimeA, 'YYYY-MM-DDTHH:mm:ss.SSS');
-    timeB = moment(departureTimeB, 'YYYY-MM-DDTHH:mm:ss.SSS');
-  }
+    if (iataStatuses[status]) {
+      flight.status = iataStatuses[status];
+    }
 
-  if (moment(timeA).isBefore(timeB)) {
-    return -1;
-  }
-  if (moment(timeA).isAfter(timeB)) {
-    return 1;
-  }
-  return 0;
-});
+    if (iataCodes[city1]) {
+      flight.departure.iataCode = iataCodes[city1].name;
+    }
+    if (iataCodes[city2]) {
+      flight.arrival.iataCode = iataCodes[city2].name;
+    }
 
-export const replaсeIataWithCities = flights => flights.map(flight => {
-  const { status, departure, arrival } = flight;
-  const { iataCode: city1 } = departure;
-  const { iataCode: city2 } = arrival;
-
-  if (iataStatuses[status]) {
-    flight.status = iataStatuses[status];
-  }
-
-  if (iataCodes[city1]) {
-    flight.departure.iataCode = iataCodes[city1].name;
-  }
-  if (iataCodes[city2]) {
-    flight.arrival.iataCode = iataCodes[city2].name;
-  }
-
-  return flight;
-});
-
-export const getDelayedFlightsOnly = (flights, type) => flights.filter(flight => {
-  const { status, departure, arrival } = flight;
-
-  if (type === 'arrival') {
-    return arrival.delay && arrival.delay > 1 && status !== 'совершил посадку';
-  }
-
-  return (
-    departure.delay
-      && departure.delay > 1
-      && status !== 'совершил посадку'
-      && status !== 'в полете'
-  );
-});
+    return flight;
+  });
+}
 
 export function receiveFlights(type) {
   // 1. Get URL
@@ -145,7 +134,7 @@ export function receiveFlights(type) {
       try {
         // 3. Sort
         const sortedFlights = sortFlightsByTime(flights, type);
-replaсeIataWithCities
+
         // 4. Sanitize
         const sanitizedFlights = sanitizeFlights(sortedFlights, type);
 
@@ -157,6 +146,23 @@ replaсeIataWithCities
         reject(e);
       }
     });
+  });
+}
+
+export function getDelayedFlightsOnly(flights, type) {
+  return flights.filter(flight => {
+    const { status, departure, arrival } = flight;
+
+    if (type === 'arrival') {
+      return arrival.delay && arrival.delay > 1 && status !== 'совершил посадку';
+    }
+
+    return (
+      departure.delay
+      && departure.delay > 1
+      && status !== 'совершил посадку'
+      && status !== 'в полете'
+    );
   });
 }
 
@@ -244,4 +250,4 @@ export function getCityAndTimeFor1Flight(type, departureData, arrivalData) {
   return { city, mainTime, secondaryTime };
 }
 
-export default fetchFlights;
+export default receiveFlights;
