@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Spinner } from 'reactstrap';
 
-import { getDelayedFlightsOnly, getCityAndTimeFor1Flight } from 'utils/helpers';
+import { getDelayedFlightsOnly, getCityAndTimeOfAFlight } from 'utils/helpers';
 
 const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => {
   // Check if only delayed flights were requested
@@ -14,11 +14,12 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
 
   // Filter flights according to the current search term (`live search`)
   flightsToDisplay = flightsToDisplay.filter(flight => {
-    const { flight: flightData } = flight;
-    const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = flightData;
+    const { flight: singleFlightData } = flight;
+    const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = singleFlightData;
 
     let isOtherFlightNumbersIncludeTerm = false;
     if (otherFlightNumbers) {
+      // eslint-disable-next-line max-len
       isOtherFlightNumbersIncludeTerm = otherFlightNumbers.some(number => number.includes(currentTermCAP)
       );
     }
@@ -29,37 +30,34 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
   // Prepare data rows for the table
   const flightRows = flightsToDisplay.map(flight => {
     // Extract required data from the single flight object
-    const { status, departure, arrival, flight: flightData } = flight;
-    const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = flightData;
+    const { status, departure, arrival, flight: singleFlightData } = flight;
+    const { iataNumber: flightNumber, otherIataNumbers: otherFlightNumbers } = singleFlightData;
 
-    let additionalFlightNumbers;
+    let additionalFlightNumbers = '';
     if (otherFlightNumbers) {
       // If there are additional flight numbers,
-      // format them for listing within the table cell.
+      // format them for listing within the single table cell.
       additionalFlightNumbers = otherFlightNumbers.map(number => (
         <span key={number}>
           {number}
           <br />
         </span>
       ));
-    } else {
-      additionalFlightNumbers = '';
     }
 
-    const { city, mainTime, secondaryTime } = getCityAndTimeFor1Flight(type, departure, arrival);
+    const { city, mainTime, secondaryTime } = getCityAndTimeOfAFlight(type, departure, arrival);
 
+    // Return actual rows
     return (
       <tr
         key={flightNumber}
         // Color code `abnormal` statuses
         style={{
           color:
-            status === 'отменен'
-            || status === 'летный инцидент'
-            || status === 'сменил курс'
-            || status === 'совершил внеплановую посадку'
-              ? 'red'
-              : 'unset'
+            status ===
+            ('отменен' || 'летный инцидент' || 'сменил курс' || 'совершил внеплановую посадку') ?
+              'red' :
+              'unset'
         }}
       >
         <td>
@@ -102,13 +100,11 @@ const FlightTable = ({ type, delayedOnly, currentTerm, isLoading, flights }) => 
             <tr>
               <th colSpan="2" style={{ textAlign: 'center' }}>
                 дата / время
-                {' '}
-                {type === 'arrival' ? 'прилета' : 'вылета'}
+                {type === 'arrival' ? ' прилета' : ' вылета'}
               </th>
               <th>
                 пункт
-                {' '}
-                {type === 'arrival' ? ' отправления' : 'прибытия'}
+                {type === 'arrival' ? ' отправления' : ' прибытия'}
               </th>
               <th>рейс №</th>
               <th>статус</th>

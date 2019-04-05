@@ -29,7 +29,7 @@ class App extends PureComponent {
     };
   }
 
-  // Receive and save departures list on page load
+  // Receive and save departure list on page load
   componentDidMount() {
     const { type } = this.state;
 
@@ -43,7 +43,7 @@ class App extends PureComponent {
   }
 
   // Receive an updated list of departures or arrivals
-  // depending on the flight type button clicked.
+  // depending on which flight type button has been clicked.
   handleTypePick(e) {
     if (e.target.nodeName !== 'BUTTON') return;
     e.preventDefault();
@@ -87,7 +87,7 @@ class App extends PureComponent {
 
   // Render the entire app
   render() {
-    const { type, delayedOnly, isLoading, currentTerm, flights } = this.state;
+    const { type, delayedOnly, currentTerm, isLoading, flights } = this.state;
 
     return (
       <Layout>

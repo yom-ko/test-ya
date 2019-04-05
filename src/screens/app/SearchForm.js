@@ -17,7 +17,13 @@ const SearchForm = ({ type, handleTypePick, handleDelayedPick, handleInputChange
         </Col>
       </FormGroup>
       <FormGroup row>
-        <Col xs={10} sm={10}>
+        <Col
+          md={8}
+          sm={12}
+          style={{
+            paddingRight: 0
+          }}
+        >
           <Input
             type="search"
             spellCheck="false"
@@ -26,8 +32,8 @@ const SearchForm = ({ type, handleTypePick, handleDelayedPick, handleInputChange
           />
         </Col>
         <Col
-          xs={2}
-          sm={2}
+          md={4}
+          sm={12}
           style={{
             fontSize: '0.9em'
           }}

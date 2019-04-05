@@ -1,4 +1,4 @@
-export const iataStatuses = {
+export const statuses = {
   scheduled: 'ожидается',
   active: 'в полете',
   landed: 'совершил посадку',
@@ -22706,13 +22706,13 @@ export const iataCodes = {
     }
   },
   TSE: {
-    name: 'Астана',
+    name: 'Нур-Султан',
     cases: {
-      ro: 'Астаны',
-      da: 'Астане',
-      vi: 'в Астану',
-      tv: 'Астаной',
-      pr: 'Астане'
+      ro: 'Нур-Султана',
+      da: 'Нур-Султану',
+      vi: 'в Нур-Султан',
+      tv: 'Нур-Султаном',
+      pr: 'Нур-Султане'
     }
   },
   TSN: {
